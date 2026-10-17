@@ -1,0 +1,191 @@
+[
+  {
+    "crop": "CORN",
+    "field": "irrigated_acres",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "CORN",
+    "field": "yield_irrigated",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "CORN",
+    "field": "yield_non_irrigated",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "CORN",
+    "field": "irrigated_acres",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "CORN",
+    "field": "yield_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "CORN",
+    "field": "yield_non_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SOYBEANS",
+    "field": "irrigated_acres",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SOYBEANS",
+    "field": "yield_irrigated",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SOYBEANS",
+    "field": "yield_non_irrigated",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SOYBEANS",
+    "field": "irrigated_acres",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SOYBEANS",
+    "field": "yield_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SOYBEANS",
+    "field": "yield_non_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "WHEAT",
+    "field": "irrigated_acres",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "WHEAT",
+    "field": "yield_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "WHEAT",
+    "field": "yield_non_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "WHEAT",
+    "field": "irrigated_acres",
+    "state_alpha": "DE",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "WHEAT",
+    "field": "yield_irrigated",
+    "state_alpha": "DE",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "WHEAT",
+    "field": "yield_non_irrigated",
+    "state_alpha": "DE",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "irrigated_acres",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "yield_irrigated",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "yield_non_irrigated",
+    "state_alpha": "CA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "irrigated_acres",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "yield_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "yield_non_irrigated",
+    "state_alpha": "IA",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "irrigated_acres",
+    "state_alpha": "DE",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "yield_irrigated",
+    "state_alpha": "DE",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  },
+  {
+    "crop": "SORGHUM",
+    "field": "yield_non_irrigated",
+    "state_alpha": "DE",
+    "status": 400,
+    "error": "{\"error\":[\"bad request - invalid query\"]}"
+  }
+]

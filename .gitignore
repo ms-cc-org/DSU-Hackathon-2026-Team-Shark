@@ -1,0 +1,14 @@
+.env
+.venv
+.DS_Store
+__pycache__/
+scratch/
+data/raw/
+.claude/
+docs1/
+NASS_HANDOVER.md
+notes.py
+test.py
+suggestions.md
+.vscode
+.ipynb_checkpoints/

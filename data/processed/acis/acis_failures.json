@@ -1,0 +1,50 @@
+[
+  {
+    "issue": "ACIS defaults to Fahrenheit and inches if units are omitted",
+    "query": "Any GridData request without explicit units parameter",
+    "status": "Common mistake — silent data corruption",
+    "cause": "ACIS returns degreeF and inches by default. If you omit the 'units' key in your elems specification, every value is wrong by a unit conversion. Temperatures of 70-90 look plausible in both Fahrenheit and Celsius, so nothing flags the error.",
+    "impact": "Every downstream calculation (GDD, extreme heat days, precipitation totals) is silently wrong. A 35°C extreme heat threshold applied to Fahrenheit data finds almost no hot days. Precipitation in inches looks small but not impossible.",
+    "resolution": "Always include 'units': 'degreeC' for temperature and 'units': 'mm' for precipitation in every elem. Validate with a plausibility check: tavg should be in [-20, 40]°C for seasonal means, not [0, 100]."
+  },
+  {
+    "issue": "30 null temperature values in California coastal counties",
+    "query": "GridData for CA, grid=1, scattered dates in 2005-2025",
+    "status": "Expected gap",
+    "cause": "Grid 1 (NRCC Interpolated) has rare null values at coastal grid cells where land-sea interpolation fails. Affected counties: 06023 (Humboldt), 06037 (Los Angeles), 06045 (Mendocino), 06079 (San Luis Obispo), 06083 (Santa Barbara). All are coastal.",
+    "impact": "30 out of 2,495,086 daily records have null tmax/tmin. This is negligible for seasonal means (< 0.001% of data). A single missing day in a 153-day season shifts the mean by less than measurement noise.",
+    "resolution": "These nulls are carried through to the daily panel. Seasonal aggregations use pandas functions that skip NaN by default (e.g. .mean() and .sum() both ignore NaN). No special handling needed unless you require zero-tolerance completeness — in that case, interpolate from neighboring days."
+  },
+  {
+    "issue": "GridData returns counties from neighboring states",
+    "query": "GridData with state='ca' returns NV and OR border counties",
+    "status": "Data quality",
+    "cause": "The ACIS area_reduce=county_mean operation returns all counties that intersect the state's grid coverage area. Border counties from neighboring states (e.g. Nevada, Oregon for California) are included.",
+    "impact": "If you do not filter, your dataset contains counties outside your target states. Joins on FIPS may silently include them or produce unexpected matches.",
+    "resolution": "Filter by the 2-digit state FIPS prefix immediately after parsing. For example, California counties all start with '06'. The pipeline does this: fips.startswith(state_fips_prefix)."
+  },
+  {
+    "issue": "Grid 3 (Hi-Res) excludes California and starts in 2011",
+    "query": "GridData with grid=3",
+    "status": "Common mistake",
+    "cause": "Grid 3 (NRCC Hi-Res) only covers the Eastern US and data begins in 2011. If you switch from grid=1 to grid=3 hoping for higher resolution, California silently disappears and 11 years of data are lost.",
+    "impact": "Your dataset shrinks without any error message. Any analysis spanning 2000-2025 or including California will have missing data.",
+    "resolution": "Use grid=1 (NRCC Interpolated) for this project. It is US-wide and covers 1950-present."
+  },
+  {
+    "issue": "Winter wheat season requires 1999 data",
+    "query": "GridData year range",
+    "status": "Design consideration",
+    "cause": "Winter wheat's growing season for harvest year 2000 starts September 1, 1999. If your weather collection starts January 1, 2000, the first wheat year is missing 4 months of its season.",
+    "impact": "Wheat year 2000 weather fields would be computed from only 6 of 10 months. Unlike the USDM (which has no data before Jan 2000), ACIS grid 1 covers from 1950, so the 1999 data is available.",
+    "resolution": "Start weather collection from 1999, not 2000. The pipeline downloads 1999-2025 (27 years). The daily panel includes 1999 data for this reason."
+  },
+  {
+    "issue": "There is no county_sum in ACIS — only county_mean",
+    "query": "Precipitation totals via GridData area_reduce",
+    "status": "Common mistake",
+    "cause": "ACIS area_reduce supports county_mean but not county_sum. For precipitation, you want a seasonal total, but the daily value from the API is already a county mean (average precipitation across the county's grid cells for that day).",
+    "impact": "Seasonal precipitation is the SUM of daily county_mean values across the season window — not a single API call for a seasonal sum. If you try area_reduce=county_sum, the request fails.",
+    "resolution": "Request daily county_mean precipitation, then sum across days in your season window. The result is total precipitation in mm for the season, averaged across the county's area."
+  }
+]

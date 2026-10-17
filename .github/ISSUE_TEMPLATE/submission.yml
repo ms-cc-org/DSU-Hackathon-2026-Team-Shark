@@ -1,0 +1,49 @@
+name: Hackathon submission
+description: Submit your team's final work (one per team, by Sunday, October 18, 2026, 12:00 PM Eastern)
+title: "Submission: <team name>"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One submission per team. This issue is public. Don't paste passwords or API keys.
+  - type: input
+    id: team
+    attributes:
+      label: Team name
+    validations:
+      required: true
+  - type: textarea
+    id: members
+    attributes:
+      label: Team members
+      description: One per line, as "Full name, @github-username"
+      placeholder: |
+        Jane Doe, @janedoe
+        John Smith, @jsmith
+    validations:
+      required: true
+  - type: input
+    id: repo
+    attributes:
+      label: Team repository URL
+      placeholder: https://github.com/ms-cc-org/dsu-hackathon-team-1
+    validations:
+      required: true
+  - type: input
+    id: sha
+    attributes:
+      label: Final commit SHA (full, 40 characters)
+      description: The exact commit you want judged
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Final checklist
+      options:
+        - label: The commit is in our team's repository and contains our completed minimum deliverable
+          required: true
+        - label: All team members are listed above
+          required: true
+        - label: The repository URL and the full commit SHA are correct
+          required: true

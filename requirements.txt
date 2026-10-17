@@ -1,0 +1,24 @@
+# Python 3.11 or newer (3.12 recommended)
+
+#data
+pandas==2.3.3
+numpy==2.4.6
+pyarrow==25.0.1         # parquet read/write
+
+#app
+streamlit==1.65.0
+plotly==7.1.0           # interactive charts in streamlit
+matplotlib==3.11.2      # static charts, pandas df.plot()
+
+#modelling
+scikit-learn==1.9.1
+statsmodels==0.15.0     # also enables plotly trendline="ols"
+
+#pipeline rebuild only
+requests==2.34.2
+python-dotenv==1.2.4     # .env file for NASS API key
+
+#notebooks
+jupyterlab==4.6.4
+ipykernel==7.4.0
+nbformat==5.11.1

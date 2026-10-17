@@ -1,0 +1,66 @@
+[
+  {
+    "issue": "valu1 table does not exist in Soil Data Access",
+    "query": "SELECT * FROM valu1",
+    "status": "HTTP 400 — Invalid object name 'valu1'",
+    "cause": "The valu1 table is part of gSSURGO (the gridded SSURGO file geodatabase product), not the SDA web service. Many SSURGO tutorials reference valu1 without noting this distinction. SDA has the raw component-level data but not the pre-computed value-added lookups.",
+    "impact": "You cannot directly query aws0_100, droughty, nccpi3corn, nccpi3soy, or nccpi3sg from SDA. You must either download the gSSURGO geodatabase or compute equivalent values from SDA tables.",
+    "resolution": "This pipeline uses SDA equivalents: muaggatt.aws0100wta for AWS (note: in centimeters, multiply by 10 for mm), a threshold on aws0100wta for droughty, and cointerp with crop-specific rulenames for NCCPI."
+  },
+  {
+    "issue": "muaggatt.aws0100wta is in centimeters, not millimeters",
+    "query": "AWS values from muaggatt",
+    "status": "Unit mismatch",
+    "cause": "SDA stores available water storage in centimeters. The gSSURGO valu1 table stores it in millimeters. Raw muaggatt values of 15-20 look wrong if you expect millimeters (they should be 150-200 mm). Nothing flags this — the values are just 10× too small.",
+    "impact": "If you do not convert, AWS values are 10× too low and the droughty threshold of 152mm applied to cm values makes nearly every county droughty.",
+    "resolution": "Multiply muaggatt.aws0100wta by 10 to convert to mm. The droughty threshold in cm is 15.2 (= 152mm / 10)."
+  },
+  {
+    "issue": "droughty_pct is an approximation of the valu1 droughty flag",
+    "query": "Droughty classification from muaggatt",
+    "status": "Design decision",
+    "cause": "The gSSURGO valu1.droughty flag uses root-zone available water storage, where root zone depth varies by soil type. Our approximation uses the fixed 0-100cm depth (aws0100wta) with a 152mm threshold. For most agricultural soils the root zone is close to 100cm, so the approximation is reasonable.",
+    "impact": "Some map units where the root zone is shallower than 100cm may be misclassified. The error is small for cropland soils in IA, NE, and DE. California may have more variation.",
+    "resolution": "Document this as an approximation. For exact values, download gSSURGO and extract valu1.droughty directly."
+  },
+  {
+    "issue": "Soil survey areas span state borders — cross-border counties appear in results",
+    "query": "SSURGO queries filtered by legend.areasymbol LIKE 'CA%'",
+    "status": "Data quality",
+    "cause": "Soil survey areas do not follow state boundaries. California survey areas overlap into Nevada (NV005, NV031, NV510) and Oregon (OR029). The laoverlap table correctly reports these counties, but they are not in our target states.",
+    "impact": "Without filtering, Nevada county code 005 converts to FIPS 06005 (California Amador County) and silently contaminates that county's soil values. Three California counties had duplicate rows with wrong values.",
+    "resolution": "After querying, filter county symbols to only those starting with the target state abbreviation (e.g. 'CA' for California). This removes all cross-border entries."
+  },
+  {
+    "issue": "NCCPI values require component-level weighting through cointerp",
+    "query": "NCCPI crop productivity indices",
+    "status": "Complex aggregation",
+    "cause": "NCCPI values are stored in the cointerp table at the component level, not the map unit level. Each map unit has multiple soil components with different NCCPI ratings. To get a map-unit-level value, you must weight by comppct_r (component percentage). Then to get a county-level value, you must area-weight across map units using muaoverlap.areaovacres.",
+    "impact": "If you skip the component weighting and just average cointerp values, you over-weight minor components. If you use mapunit.muacres instead of muaoverlap.areaovacres, you misallocate acres for multi-county survey areas.",
+    "resolution": "The pipeline uses: SUM(areaovacres × comppct_r × interphr) / SUM(areaovacres × comppct_r) per county. The three NCCPI rule names are: 'NCCPI - NCCPI Corn Submodel (I)', 'NCCPI - NCCPI Soybeans Submodel (I)', 'NCCPI - NCCPI Small Grains Submodel (II)'."
+  },
+  {
+    "issue": "cointerp queries time out on large unfiltered scans",
+    "query": "Any DISTINCT or unfiltered query against cointerp",
+    "status": "SDA timeout",
+    "cause": "The cointerp table has hundreds of millions of rows (every interpretation × every component × every survey area). A query without early filtering (e.g. a CTE that scans all cointerp before joining) will time out at SDA's server-side limit.",
+    "impact": "Your query returns an empty response or an XML error: 'Your query timed out.'",
+    "resolution": "Always filter early by joining from legend (filtered by state) through mapunit and component before reaching cointerp. The state filter on legend narrows the scan to a manageable size. Per-state queries take 10-60 seconds; unfiltered queries never finish."
+  },
+  {
+    "issue": "One county has null soil values",
+    "query": "All soil fields for all counties",
+    "status": "Expected gap",
+    "cause": "Some counties (typically in California) have large non-survey areas (national forests, military installations, tribal lands) where SSURGO has no soil mapping. The area-weighted mean returns null when the survey coverage is insufficient.",
+    "impact": "1 county, Marin (06041), has NaN for all 5 soil fields. It has no NASS crop records, so it is not in the master; the data dictionary notes it.",
+    "resolution": "Do not impute. NaN means the soil data is not available for that county. The data dictionary lists the affected county."
+  },
+  {
+    "issue": "NCCPI has no sorghum model — corn is used as proxy",
+    "query": "nccpi_crop for SORGHUM rows",
+    "status": "Design decision",
+    "cause": "The NCCPI system (version 3.0) has submodels for corn, soybeans, small grains, and cotton, but not sorghum. Grain sorghum shares corn's growing season and coarse-grain management practices.",
+    "impact": "Sorghum rows in the master dataset use nccpi3corn as their nccpi_crop value. This is a documented proxy, not an exact match.",
+    "resolution": "Document this clearly in the data dictionary. The proxy is reasonable for the Nebraska corn-vs-sorghum comparison (research question 3) but should not be interpreted as sorghum-specific soil suitability."
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "counties": 253,
+  "pairs": 656,
+  "universe_rows": 17056,
+  "yield_status": {
+    "reported": 11639,
+    "not_reported": 5343,
+    "suppressed": 74
+  },
+  "yield_anomaly_count": 10995,
+  "weather_null_rows": 0,
+  "final_rows": 17056,
+  "final_columns": 21,
+  "validation": {
+    "passed": 27,
+    "failed": 0,
+    "total": 27
+  },
+  "timestamp": "2026-10-05T15:15:09.648645"
+}

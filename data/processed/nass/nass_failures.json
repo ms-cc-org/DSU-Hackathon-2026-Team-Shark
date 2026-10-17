@@ -1,0 +1,50 @@
+[
+  {
+    "issue": "California soybeans: no data exists",
+    "query": "SOYBEANS yield/acres_harvested/acres_planted for CA",
+    "status": "HTTP 400",
+    "cause": "California does not grow soybeans at a scale NASS surveys. The API returns 'bad request' because no matching records exist, not because the query is malformed.",
+    "impact": "Zero SOYBEANS rows for CA in the dataset. This is correct — it means the crop is not grown here, not that data is missing.",
+    "resolution": "No rows are created. Do NOT fill with zeros — absence of rows means the crop is not grown. If your analysis filters to CA soybeans, expect an empty result."
+  },
+  {
+    "issue": "Iowa sorghum: no data in 2000-2025",
+    "query": "SORGHUM yield/acres_harvested/acres_planted for IA",
+    "status": "FILTERED_TO_ZERO",
+    "cause": "NASS returned 2,067 historical sorghum records for Iowa, but all predate the year 2000. Iowa stopped growing sorghum at survey-reportable scale before our analysis window.",
+    "impact": "Zero SORGHUM rows for IA in the dataset.",
+    "resolution": "Same as CA soybeans: absence means not grown, not missing. The raw API data (pre-2000) is archived in data/raw/nass/ if you want to explore historical patterns."
+  },
+  {
+    "issue": "Planted acres use different NASS filters than yield/harvested",
+    "query": "AREA PLANTED for CORN and SORGHUM (all states)",
+    "status": "HTTP 400 (original), fixed",
+    "cause": "NASS reports planted acres at the total commodity level, not split by utilization practice (grain vs silage). Sending util_practice_desc=GRAIN with a planted-acres query returns HTTP 400. Yield and harvested acres ARE split by utilization, so the same filter works for those.",
+    "impact": "If you query NASS for planted acres of corn or sorghum, do NOT include util_practice_desc in your parameters. For yield and harvested acres, you MUST include it to avoid double-counting grain and silage rows.",
+    "resolution": "The pipeline drops util_practice_desc from planted-acres requests. The dedup filter also exempts AREA PLANTED from the ALL UTILIZATION PRACTICES removal step."
+  },
+  {
+    "issue": "Some yields are published as zero, not null",
+    "query": "YIELD, all crops and states",
+    "status": "Data quality",
+    "cause": "NASS lists some county-crop-years with planted acres, a yield of Value='0' and no grain acres harvested: the crop was planted but no grain was harvested (for corn, NASS's silage series shows the acres were cut for silage). All 74 cases are 2000–2008. The SURVEY pull returned no '(D)' values. A zero yield is not a real observation.",
+    "impact": "74 yield rows had value <= 0 and were set to NaN. If you pull NASS data yourself, always check for and null out zero yields.",
+    "resolution": "The pipeline converts non-numeric values and zeros to NaN via pd.to_numeric(errors='coerce') and an explicit <= 0 check. The master labels these rows yield_status = 'suppressed', separate from 'not_reported'."
+  },
+  {
+    "issue": "Duplicate rows from ALL UTILIZATION PRACTICES / ALL CLASSES",
+    "query": "CORN, SORGHUM, WHEAT yield and harvested acres",
+    "status": "Data quality",
+    "cause": "NASS sometimes publishes the same county-year observation under both a specific category (e.g. util_practice_desc=GRAIN) and an aggregate (ALL UTILIZATION PRACTICES). Similarly, winter wheat appears under both class_desc=WINTER and ALL CLASSES. Querying by short_desc alone returns both, doubling your rows.",
+    "impact": "Without dedup, every downstream analysis is inflated. The duplicates are silent — row counts look plausible and no error is raised.",
+    "resolution": "Pin util_practice_desc=GRAIN for corn/sorghum and class_desc=WINTER for wheat in yield/harvested queries. The pipeline also has a safety-net dedup that drops ALL UTILIZATION PRACTICES and ALL CLASSES rows (except for AREA PLANTED, which is only reported under ALL)."
+  },
+  {
+    "issue": "OTHER COMBINED COUNTIES (county_code=998)",
+    "query": "All crop-state combinations",
+    "status": "Data quality",
+    "cause": "NASS uses county_code 998 to publish aggregated data for counties it doesn't publish individually. These rows have county_name 'OTHER (COMBINED) COUNTIES' and contain totals for those counties in each district, producing conflicting values that create duplicates.",
+    "impact": "1,567 rows removed. If you do not filter these, you get duplicate (fips, year, crop, statistic) keys and your joins will fan out.",
+    "resolution": "Filter out county_code == '998' before any analysis. These are not real counties."
+  }
+]

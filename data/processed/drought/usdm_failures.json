@@ -1,0 +1,42 @@
+[
+  {
+    "issue": "No drought data before January 4, 2000",
+    "query": "Any USDM query with dates before 2000-01-04",
+    "status": "Expected gap",
+    "cause": "The U.S. Drought Monitor archive begins on January 4, 2000. There is no county-level drought classification data before this date from USDM.",
+    "impact": "Winter wheat year 2000 has a growing season starting September 1, 1999 — 17 of its 43 weekly maps fall before the archive starts. All 3 drought fields (max_drought_severity, weeks_in_d2_plus, mean_dsci) are set to NaN for crop=WHEAT AND year=2000.",
+    "resolution": "Do NOT impute or zero-fill. NaN means the data does not exist for that period. If you define custom season windows that start before 2000-01-04, you must handle partial coverage — either set to NaN or document the fraction of the season covered."
+  },
+  {
+    "issue": "Categorical vs Cumulative statistics — using the wrong type silently breaks DSCI",
+    "query": "statisticsType parameter in USDM API",
+    "status": "Common mistake",
+    "cause": "USDM offers two statistics formats: Categorical (statisticsType=2) where D0-D4 are non-overlapping, and Cumulative (statisticsType=1) where D0 includes D1-D4. Under cumulative, D2+D3+D4 triple-counts overlap area and DSCI values exceed 500.",
+    "impact": "If you accidentally use statisticsType=1, your DSCI formula (D0×1 + D1×2 + D2×3 + D3×4 + D4×5) produces values above 500 and every drought severity calculation is wrong. The numbers still look plausible at a glance.",
+    "resolution": "Always use statisticsType=2 (Categorical). Verify by checking that None + D0 + D1 + D2 + D3 + D4 = 100% for every row. If the sum exceeds 100, you have cumulative data."
+  },
+  {
+    "issue": "The 1% area threshold matters for severity classification",
+    "query": "Computing max_drought_severity from weekly data",
+    "status": "Design decision",
+    "cause": "Without a threshold, a sliver of a county (0.01%) in D4 sets max_drought_severity to 5 for the entire row. This makes the field noisy and hard to defend in an analysis.",
+    "impact": "max_drought_severity uses >1% of county area as the threshold. A county with 0.5% in D4 but 30% in D2 shows severity=3 (D2), not severity=5 (D4).",
+    "resolution": "When computing severity from raw USDM data, decide on a threshold and document it. Our dataset uses 1%. If you want a different threshold, recompute from the drought_weekly.parquet panel."
+  },
+  {
+    "issue": "USDM API defaults to CSV, not JSON",
+    "query": "Any request without Accept header",
+    "status": "Common mistake",
+    "cause": "The USDM REST API returns CSV by default. If you call response.json() without setting Accept: application/json, you get a parse error with no useful message.",
+    "impact": "Your script crashes on the first request with a JSONDecodeError.",
+    "resolution": "Set headers={'Accept': 'application/json'} in your request, or parse the response as CSV instead."
+  },
+  {
+    "issue": "FIPS codes lose their leading zero when read as numbers",
+    "query": "Any USDM JSON response",
+    "status": "Data quality",
+    "cause": "The JSON response gives FIPS as 5-character strings ('06001'), but the default CSV response has them unquoted, so pandas read_csv turns '06001' into 6001. California, with state FIPS 06, loses its leading zero. If you join on FIPS without zero-padding, no California counties match.",
+    "impact": "All California joins silently produce zero rows. No error is raised.",
+    "resolution": "Always convert FIPS to a zero-padded 5-character string: str(fips).zfill(5). Do this immediately after loading the data, before any joins."
+  }
+]
