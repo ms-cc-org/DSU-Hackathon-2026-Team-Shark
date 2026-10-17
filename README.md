@@ -1,3 +1,78 @@
+# Historical Drought Exposure Map
+
+## Overview
+
+This project provides an interactive, county-level map for exploring historical drought exposure and drought-year crop losses using the master dataset. It is designed to support data-driven soil conservation planning by helping users investigate where drought has historically coincided with agricultural yield losses.
+
+The map supports all states and crop categories present in the master dataframe, subject to the geographic coverage of the county boundary data.
+
+**Important:** The map describes historical exposure, not current conditions or a prediction that a county is “at risk.” It does not establish that a specific soil conservation intervention will reduce crop losses.
+
+## Features
+
+The interactive Jupyter notebook provides four dropdown controls:
+
+- **State:** Select an individual state or view all states.
+- **Crop:** Select a crop category available in the master dataset.
+- **Drought definition:** Choose D2+, D3+, or D4-only drought conditions.
+- **Map measure:** Switch between historical drought exposure and drought-year yield anomalies.
+
+### Map measures
+
+**1. Historical exposure**
+
+Displays the number of county-year records meeting the selected drought threshold. Counties with more matching records have experienced more qualifying drought observations in the analyzed dataset.
+
+**2. Drought-year losses**
+
+Displays the mean yield anomaly percentage among records meeting the selected drought threshold. Negative values indicate yields below the baseline used to calculate the yield anomaly.
+
+County details are available by hovering over the map, including drought-record counts, mean drought severity, and mean yield anomaly.
+
+## Data and methodology
+
+The notebook uses the project's master dataset and county boundary data, loaded through the existing data-loader module.
+
+### County-level aggregation
+
+After filtering records by state, crop, and drought threshold, the notebook groups observations by county.
+
+It calculates:
+- The number of matching drought records.
+- The mean drought severity among matching records.
+- The mean yield anomaly among matching records.
+
+The resulting county summaries are displayed as an interactive choropleth map.
+
+## Interpretation and limitations
+
+The map is intended for exploratory analysis and conservation-planning support.
+
+- Historical drought exposure does not necessarily imply future vulnerability.
+- Negative yield anomalies do not, by themselves, establish that drought caused the observed losses.
+- The number of matching records should be interpreted as a count of distinct drought years only if the underlying data contains one record per county, crop, and year.
+- County boundary coverage and FIPS formatting must be consistent with the master dataset for the map to render correctly.
+- Differences in yield anomalies may reflect soil properties, rainfall, temperature, crop selection, and other factors.
+- The map does not directly measure the effectiveness of soil conservation programs.
+
+Estimating intervention effectiveness would require additional information about conservation practices, program participation, and a suitable comparison methodology.
+
+## Project objective
+
+The goal is to help soil conservation decision-makers explore historical patterns of drought exposure and crop yield anomalies, identify geographic differences, and determine where further investigation or conservation planning may be warranted.
+
+The map is a decision-support tool rather than a definitive ranking of future drought risk or conservation-program effectiveness.
+
+
+
+
+
+
+
+
+
+
+
 # Data to Harvest: AI for Agricultural Resilience Hackathon
 
 **October 17–18, 2026 | Delaware State University | 24 hours**
