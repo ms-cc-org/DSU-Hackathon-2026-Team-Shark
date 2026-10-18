@@ -200,7 +200,8 @@ n_counties = ia[tool.COL_FIPS].nunique()
 data_years = f"{int(ia[tool.COL_YEAR].min())}–{int(ia[tool.COL_YEAR].max())}"
 
 st.title("Soil Program Planner — Iowa corn and soybeans")
-st.markdown(f"For the Soil Conservation Office: where soil programs would cut drought losses most. "
+st.markdown("For the Soil Conservation Office: each winter, before the next season's program sign-ups, decide which "
+            "counties get priority for soil-program outreach and funding to cut drought losses. "
             f"Data: {n_counties} Iowa counties, {data_years}.")
 with st.expander("What we found", expanded=True):
     st.markdown(tool.HEADLINE)
@@ -233,6 +234,7 @@ with st.sidebar:
         f"only, checked on the {TEST_LABEL} drought years they had never seen.\n\n"
         f"`notebooks/Soil_Program_Planner.ipynb` shows the same analysis as a report."
     )
+    st.markdown(tool.DATA_CREDITS)
 
 # ----------------------------------------------------------------------------------
 # Tiles for the selected crop

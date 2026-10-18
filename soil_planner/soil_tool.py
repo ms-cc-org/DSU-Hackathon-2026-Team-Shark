@@ -692,12 +692,13 @@ LIMITS_NOTE = """- **Association, not program effect.** The drought penalty and 
 - **Yield data thin out after 2022.** Fewer counties report yields in recent years, so recent drought penalties are missing for more counties, especially soybeans.
 - **Extra soil and practice data are context only.** The surface-soil properties (September 2026 SSURGO release) and the Census of Agriculture practice shares (2017 and 2022) shown in the county panel were not tested against drought losses and play no part in the ranking or the evidence.
 - Our score measures where drought losses have occurred, not where soil programs would reduce them. That is only part of the office's mission (Bueno de Mesquita & Fowler, ch. 16).
-- The lessons come from Iowa, 2000–2025. Future droughts, new practices, or other states may not behave the same way."""
+- The lessons come from Iowa, 2000–2025. Future droughts, new practices, or other states may not behave the same way.
+- A pre-registered replication on Nebraska's rain-fed counties could not be run: irrigation leaves only 13–18 mostly-dryland counties, below our pre-set minimum of 20."""
 
 NEXT_STEPS_NOTE = """**Next steps**
 - **Test whether programs work.** Once the office funds programs in some counties, compare how drought penalties change in funded versus unfunded counties, before and after. That is a true difference-in-differences test of program impact (Bueno de Mesquita & Fowler, ch. 13).
 - **Use the lever, not just the context.** Compare the change in cover-crop and no-till adoption between the 2017 and 2022 Censuses with the change in each county's drought penalty.
-- **Measure drought timing.** Use the weekly Drought Monitor maps to focus on drought during critical growth months, and a continuous intensity measure (DSCI) instead of a single threshold.
+- **Measure drought timing.** The master dataset already includes a seasonal mean drought intensity (`mean_dsci`, 0–500 scale) that could replace the single D2+ threshold; the weekly Drought Monitor maps would add timing within the season, to focus on drought during critical growth months.
 - **Limited evidence is not a reason to do nothing.** The storage result was inconclusive, but not acting is also a decision; local evaluation of practices in priority counties is a reasonable response (Bueno de Mesquita & Fowler, ch. 17)."""
 
 
@@ -823,3 +824,10 @@ def priority_reasons(ia_all: pd.DataFrame, scores: pd.DataFrame, fips: str, crop
         + (f", fewer than {LOW_CONFIDENCE_YEARS}; verify with local information." if row["confidence"] == CONFIDENCE_LOWER else "."),
     ]
     return reasons
+
+DATA_CREDITS = """**Data credits.** Credit the sources when presenting results from this data (wording from the hackathon README):
+- **USDA NASS Quick Stats** (county yields; Census of Agriculture conservation practices): This product uses the NASS API but is not endorsed or certified by NASS.
+- **NOAA ACIS** (weather): Weather data from the Applied Climate Information System (ACIS), NOAA Regional Climate Centers.
+- **U.S. Drought Monitor** (drought): The U.S. Drought Monitor is jointly produced by the National Drought Mitigation Center at the University of Nebraska-Lincoln, the United States Department of Agriculture, and the National Oceanic and Atmospheric Administration.
+- **USDA NRCS SSURGO / Soil Data Access** (soil): Soil Survey Staff, Natural Resources Conservation Service, United States Department of Agriculture. Soil Survey Geographic (SSURGO) Database, via Soil Data Access.
+- **Data to Harvest hackathon master dataset** (Delaware State University, October 2026): the county x crop x year table that combines the sources above."""
