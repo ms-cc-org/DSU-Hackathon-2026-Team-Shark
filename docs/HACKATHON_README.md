@@ -125,7 +125,7 @@ Keep it as text. If it's read as a number, `06001` becomes `6001` and California
 - **Irrigation**: the share of each crop that was irrigated and irrigated vs. dryland yields, mostly for Nebraska 2000–2018, matched by county, crop and year.
 - **County boundaries** for maps.
 
-Every column, every gap and every known limitation is explained in the [**data dictionary**](data/data_dictionary.md). Read it before you start.
+Every column, every gap and every known limitation is explained in the [**data dictionary**](../data/data_dictionary.md). Read it before you start.
 
 ---
 
@@ -311,7 +311,7 @@ If you publish or present results from this data, credit the sources:
 - **MODIS:** Didan, K. (2021). MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD13Q1.061
 - **County boundaries** (`data/counties.geojson`): U.S. Census Bureau county boundaries, from the [plotly/datasets](https://github.com/plotly/datasets) county GeoJSON.
 
-The code and documentation in this repo are under the [MIT License](LICENSE).
+The code and documentation in this repo are under the [MIT License](../LICENSE).
 
 ## Rebuilding the data (organizers only)
 
