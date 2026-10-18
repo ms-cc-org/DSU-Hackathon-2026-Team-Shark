@@ -346,3 +346,15 @@ Then add `EE_PROJECT=your-cloud-project-id` to `.env`.
 
 Never commit `.env`.
 </details>
+## How to run the Soil Program Planner (Team Shark)
+
+Activate the virtual environment, then start the app from the repo root:
+
+```bash
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
+python -m streamlit run soil_planner/app.py
+```
+
+The app opens in your browser with five tabs: Priority map, Priority list, County report card, Evidence and Limits. The first load takes a few seconds while the drought penalties and the held-out test are computed; after that every setting change is instant.
+
+`notebooks/Soil_Program_Planner.ipynb` shows the same analysis as a report. The app and the notebook call the same functions in `soil_planner/soil_tool.py`, so they show the same numbers. To re-run the notebook from the command line: `jupyter nbconvert --to notebook --execute --inplace notebooks/Soil_Program_Planner.ipynb`.
