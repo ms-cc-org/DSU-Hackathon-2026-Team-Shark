@@ -355,6 +355,6 @@ source .venv/bin/activate            # Windows: .venv\Scripts\activate
 python -m streamlit run soil_planner/app.py
 ```
 
-The app opens in your browser with five tabs: Priority map, Priority list, County report card, Evidence and Limits. The first load takes a few seconds while the drought penalties and the held-out test are computed; after that every setting change is instant.
+The app opens in your browser with a menu of six pages in three groups: Plan (This winter's plan, County explorer), Evidence (How we know it works, How we got here) and Reference (Limits and next steps, About and data sources). The crop and drought definition chosen at the top apply to every page. The first load takes a few seconds while the drought penalties and the held-out test are computed; after that every setting change is instant.
 
 `notebooks/Soil_Program_Planner.ipynb` shows the same analysis as a report. The app and the notebook call the same functions in `soil_planner/soil_tool.py`, so they show the same numbers. To re-run the notebook from the command line: `jupyter nbconvert --to notebook --execute --inplace notebooks/Soil_Program_Planner.ipynb`.
