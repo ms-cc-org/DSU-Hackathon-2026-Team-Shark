@@ -1,7 +1,8 @@
 """County explorer: the map at full width on top, then the county information in three cards below it.
 
 Top to bottom: the map metric selectbox, the choropleth (counties to fund outlined, click to select), its caption;
-then a header row with the County selectbox and the county's name, crop and definition; then three cards (drought
+then a header row with the County selectbox and the county's name, crop, definition and badges
+(green "priority county" = act now, orange "lower confidence" = verify first); then three cards (drought
 score, soil context, current practices); then, for priority counties, the reasons box, and the year-by-year expander.
 Runs through soil_planner/app.py (st.navigation), which sets the shared crop and drought-definition controls.
 The selected county is kept in st.session_state (key app_common.KEY_COUNTY) and survives page switches."""
@@ -23,10 +24,20 @@ priority_fips = set(top[tool.COL_FIPS])                       # the tested top t
 fund = ac.top_n(crop, ac.n_fund(crop))                          # counties to fund (slider on This winter's plan): outlines
 fund_fips = set(fund[tool.COL_FIPS])
 
+st.header("County explorer")
+
 # ----------------------------------------------------------------------------------
 # 1. Map, full width
 # ----------------------------------------------------------------------------------
-metric_label = st.selectbox("Map metric", list(tool.METRICS), key=ac.KEY_METRIC, persist_state="session")
+# The selectbox's help text explains the metric currently chosen (read from session state, which already holds the
+# new choice when a change triggers the rerun) and says what a blank county means for it.
+_cur_label = st.session_state.get(ac.KEY_METRIC) or list(tool.METRICS)[0]
+_cur_col = tool.METRICS.get(_cur_label, list(tool.METRICS.values())[0])
+_cur_blank = int(stats[_cur_col].isna().sum())
+_help = ac.MAP_CAPTIONS[_cur_col] + " " + (f"Blank counties have no score for this setting ({_cur_blank} here)."
+                                           if _cur_blank else
+                                           "Blank counties would have no score for this setting; every county has one here.")
+metric_label = st.selectbox("Map metric", list(tool.METRICS), key=ac.KEY_METRIC, persist_state="session", help=_help)
 metric_col = tool.METRICS[metric_label]
 n_blank = int(stats[metric_col].isna().sum())
 clicked = None
@@ -42,10 +53,8 @@ else:
     event = st.plotly_chart(fig, width="stretch", on_select="rerun", selection_mode="points",
                             key=f"map_{crop}_{sev}_{metric_col}")
     clicked = ac.clicked_fips(event, stats)
-    blank_txt = (f"Blank counties have no score for this setting ({n_blank} here)." if n_blank
-                 else "Blank counties would have no score for this setting; every county has one here.")
-    st.caption(f"{ac.MAP_CAPTIONS[metric_col]} {blank_txt} The top {len(fund)} counties to fund (slider on "
-               "This winter's plan) have a dark outline. Click a county to open it below.")
+    st.caption(f"Dark outline = the {len(fund)} counties to fund (slider on This winter's plan). "
+               "Click a county to open it below.")
 
 # ----------------------------------------------------------------------------------
 # 2. Selected county: reset to the top-ranked county when the crop changes, follow map clicks, else keep the selection.
@@ -72,9 +81,16 @@ with h_left:
 fips = name_to_fips[county]
 row = stats[stats[tool.COL_FIPS] == fips]
 on_list = fips in priority_fips
+is_lower = (not row.empty) and row.iloc[0]["confidence"] == tool.CONFIDENCE_LOWER
 with h_right:
     st.markdown(f"### {county}")
-    st.markdown(f"{crop_label}, {def_label}" + (" · **priority county**" if on_list else ""))
+    st.markdown(f"{crop_label}, {def_label}")
+    if on_list or is_lower:
+        with st.container(horizontal=True):
+            if on_list:
+                st.badge("priority county", color="green")
+            if is_lower:
+                st.badge("lower confidence", color="orange")
 if row.empty:
     st.info(f"No Iowa {crop_label.lower()} yields are reported for {county}.")
     st.stop()

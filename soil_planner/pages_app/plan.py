@@ -17,6 +17,8 @@ with st.spinner("Running the held-out test (first load only)…"):
 hm = tool.headline_metrics(rk["summary"], crop)
 first = top.iloc[0]
 
+st.header("This winter's plan")
+
 # ----------------------------------------------------------------------------------
 # 1. Counties to fund (slider) and the recommendation
 # ----------------------------------------------------------------------------------
@@ -31,10 +33,14 @@ std = fund[fund["confidence"] == tool.CONFIDENCE_STANDARD]
 low = fund[fund["confidence"] == tool.CONFIDENCE_LOWER]
 n_std, n_low = len(std), len(low)
 
+# Colour vocabulary: green box = act now; the lower-confidence names are orange = verify first.
+low_names = ", ".join(c.replace(" County", "") for c in low[tool.COL_COUNTY])
 st.success(
     f"**Recommendation for this winter's sign-ups ({crop_label}):** Start outreach in the **{n_std} counties with "
-    f"standard confidence among the top {len(fund)}**. Verify the **{n_low} lower-confidence counties** with local staff "
-    f"before committing funds. Pair any program with a before-and-after comparison of funded and unfunded counties.")
+    f"standard confidence among the top {len(fund)}**. Verify the **{n_low} lower-confidence counties**"
+    + (f" (:orange[{low_names}])" if n_low else "")
+    + " with local staff before committing funds. Pair any program with a before-and-after comparison of funded and "
+    "unfunded counties.")
 shares = ac.bushel_shares(crop, tuple(fund[tool.COL_FIPS]))
 if shares is not None:
     st.caption(f"These {len(fund)} counties account for about {shares[0]:.0%} of Iowa's expected {crop_label.lower()} "
@@ -64,8 +70,8 @@ with k3.container(border=True):
 # 3. Priority list
 # ----------------------------------------------------------------------------------
 no_score = dep.loc[~dep["has_score"], tool.COL_COUNTY].tolist()
-st.markdown(f"**Priority list — {crop_label}: top {len(fund)} of {int(dep['has_score'].sum())} scored counties** "
-            f"(no score for {len(no_score)}: {', '.join(no_score) if no_score else 'none'})")
+st.subheader(f"Priority list — {crop_label}: top {len(fund)} of {int(dep['has_score'].sum())} scored counties")
+st.markdown(f"No score for {len(no_score)}: {', '.join(no_score) if no_score else 'none'}.")
 st.caption(f"The top {len(fund)} counties by drought penalty, all years {ac.ALL_YEARS}, {ac.D2_LABEL}, largest penalty first. "
            f"This list does not change with the drought definition selected above.")
 view = (fund[list(ac.PRIORITY_COLUMNS)].rename(columns=ac.PRIORITY_COLUMNS)

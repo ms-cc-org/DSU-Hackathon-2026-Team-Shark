@@ -9,6 +9,7 @@ ia = ac.load_data()
 n_counties = ia[tool.COL_FIPS].nunique()
 data_years = f"{int(ia[tool.COL_YEAR].min())}–{int(ia[tool.COL_YEAR].max())}"
 
+st.header("About and data sources")
 st.markdown(
     f"**Data.** USDA NASS county yields, U.S. Drought Monitor weekly maps, NOAA ACIS weather and NRCS SSURGO soil, "
     f"combined in the Data to Harvest hackathon master dataset: {n_counties} Iowa counties, {data_years}, corn and "

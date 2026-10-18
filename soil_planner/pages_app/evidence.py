@@ -12,6 +12,8 @@ with st.spinner("Running the held-out test (first load only)…"):
     rk = ac.ranking_evidence()
 hm = tool.headline_metrics(rk["summary"], crop)
 
+st.header("How we know it works")
+
 # ----------------------------------------------------------------------------------
 # 1. Scorecard and 2. proof chart
 # ----------------------------------------------------------------------------------
@@ -29,7 +31,7 @@ scorecard = pd.DataFrame([
 ], columns=["What we tested", "Result"])
 sc_col, chart_col = st.columns([2, 3])
 with sc_col:
-    st.markdown("**What we tested**")
+    st.subheader("What we tested")
     st.table(scorecard.set_index("What we tested"))
 with chart_col:
     st.plotly_chart(ac.proof_chart(rk["summary"], crop), width="stretch")
@@ -39,7 +41,8 @@ with chart_col:
 # ----------------------------------------------------------------------------------
 st.divider()
 st.subheader(f"Does the drought-penalty score hold up on years it never saw? ({ac.TRAIN_LABEL} → {ac.TEST_LABEL})")
-st.markdown(
+prose, _ = st.columns([2, 1])
+prose.markdown(
     f"Three scores were built from {ac.TRAIN_LABEL} only: the drought-penalty score, drought frequency and soil "
     f"water storage. Each was then asked to rank counties in the {ac.TEST_LABEL} drought years. **Spearman** is the "
     "rank correlation between the score and the actual drought penalty that year, signed so positive means the "
@@ -61,7 +64,8 @@ st.markdown("**Computed verdict.** Score / metric combinations whose whole range
                                   if len(beats) else "none") + ".")
 
 st.subheader("Does soil water storage go with smaller drought penalties?")
-st.markdown(
+prose, _ = st.columns([2, 1])
+prose.markdown(
     f"For each year with at least {tool.MIN_COUNTIES_PER_YEAR} drought counties, the slope of the drought penalty "
     f"on storage across those counties, in percentage points per extra {tool.AWS_UNIT:.0f} mm of storage, "
     "averaged over years with a range from resampling years. Positive would mean more storage, smaller penalty. "
@@ -84,7 +88,8 @@ st.markdown(f"**Computed verdict.** {n_excl} of {n_dr} drought-year storage esti
 # 4. Earlier attempts, collapsed
 # ----------------------------------------------------------------------------------
 with st.expander("Earlier attempts and why we moved on", expanded=False):
-    st.markdown(
+    prose, _ = st.columns([2, 1])
+    prose.markdown(
         "The first storage estimate (notebook 03) used the dataset's own yield anomaly, a trend fitted on all "
         "years and therefore in-sample, and found no clear effect. The first held-out ranking test (notebook 04) "
         f"built scores on a {ac.TRAIN_LABEL} trend and failed: no score beat chance, and the scores \"predicted\" "
