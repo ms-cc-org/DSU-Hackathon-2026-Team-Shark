@@ -101,10 +101,6 @@ They write no files; each notebook's results are the tables and verdicts inside 
 
 The app uses the files already in `soil_planner/extra_data/` (see `soil_planner/extra_data/README.md` for their sources, dates and methods). Re-pulling them with the scripts in `soil_planner/pulls/` is optional. The conservation-practices pull needs a free [NASS Quick Stats key](https://quickstats.nass.usda.gov/api) in a `.env` file at the repository root (`NASS_API_KEY=your_key_here`), which `.gitignore` excludes; the soil pull needs no key. Never commit keys.
 
-## Documents
-
-- [Full reasoning](docs/Soil_Program_Planner_Full_Reasoning.pdf): `docs/Soil_Program_Planner_Full_Reasoning.pdf`
-- [Story](docs/Soil_Program_Planner_Story.pdf): `docs/Soil_Program_Planner_Story.pdf`
 
 ## Acknowledgments
 
