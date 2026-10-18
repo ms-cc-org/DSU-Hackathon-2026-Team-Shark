@@ -15,7 +15,9 @@ idx = ac.county_index()
 names = idx[tool.COL_COUNTY].tolist()
 name_to_fips = dict(zip(idx[tool.COL_COUNTY], idx[tool.COL_FIPS]))
 fips_to_name = dict(zip(idx[tool.COL_FIPS], idx[tool.COL_COUNTY]))
-priority_fips = set(top[tool.COL_FIPS])
+priority_fips = set(top[tool.COL_FIPS])                       # the tested top third: badge and reasons in the panel
+fund = ac.top_n(crop, ac.n_fund(crop))                          # counties to fund (slider on This winter's plan): outlines
+fund_fips = set(fund[tool.COL_FIPS])
 
 left, right = st.columns([3, 2])
 
@@ -29,17 +31,17 @@ with left:
                 f"Try the other drought definition or another metric.")
     else:
         fig = tool.make_map(stats, metric_col, metric_label, crop_label, def_label)
-        is_priority = stats[tool.COL_FIPS].isin(priority_fips).to_numpy()      # same row order as the trace
-        fig.update_traces(marker_line_width=np.where(is_priority, 2.2, 0.5),
-                          marker_line_color=np.where(is_priority, "#222222", "white"))
+        is_funded = stats[tool.COL_FIPS].isin(fund_fips).to_numpy()            # same row order as the trace
+        fig.update_traces(marker_line_width=np.where(is_funded, 2.2, 0.5),
+                          marker_line_color=np.where(is_funded, "#222222", "white"))
         fig.update_layout(height=520, title_font_size=15)
         event = st.plotly_chart(fig, width="stretch", on_select="rerun", selection_mode="points",
                                 key=f"map_{crop}_{sev}_{metric_col}")
         clicked = ac.clicked_fips(event, stats)
         blank_txt = (f"Blank counties have no score for this setting ({n_blank} here)." if n_blank
                      else "Blank counties would have no score for this setting; every county has one here.")
-        st.caption(f"{ac.MAP_CAPTIONS[metric_col]} {blank_txt} Priority counties have a dark outline. "
-                   "Click a county to open it in the panel on the right.")
+        st.caption(f"{ac.MAP_CAPTIONS[metric_col]} {blank_txt} The top {len(fund)} counties to fund (slider on "
+                   "This winter's plan) have a dark outline. Click a county to open it in the panel on the right.")
 
 # Selected county: reset to the top-ranked county when the crop changes, follow map clicks, else keep the selection.
 default_county = first[tool.COL_COUNTY]

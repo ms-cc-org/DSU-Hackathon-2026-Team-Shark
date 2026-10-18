@@ -31,6 +31,7 @@ KEY_METRIC = "map_metric"          # County explorer: map metric selectbox
 KEY_COUNTY = "county_select"       # County explorer: selected county (name)
 KEY_COUNTY_CROP = "county_crop"    # County explorer: crop the selected county was chosen for
 KEY_LAST_CLICK = "last_click"      # County explorer: last map click already handled (fips)
+KEY_N_FUND = "n_fund"              # This winter's plan: "Counties we can fund this winter" slider, read by County explorer
 
 # Page files, relative to the entrypoint (st.Page in app.py, st.page_link in the pages).
 PAGE_PLAN = "pages_app/plan.py"
@@ -117,6 +118,43 @@ def earlier_storage_evidence() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def earlier_ranking_evidence() -> dict:
     return tool.ranking_test_results(load_data())
+
+
+def top_n(crop: str, n: int) -> pd.DataFrame:
+    """The top `n` counties of OUR deployment ranking (deployment_penalty_scores order, as priority_list uses it),
+    with the same columns as priority_list. priority_list() is top_n() at the tested top third."""
+    scores = deployment_scores(crop)
+    n_scored = int(scores["has_score"].sum())
+    return tool.priority_list(scores, share=min(int(n), n_scored) / n_scored)
+
+
+def n_fund(crop: str) -> int:
+    """Counties to fund, from the slider on This winter's plan; the tested top third until the slider is moved."""
+    return int(st.session_state.get(KEY_N_FUND) or len(priority(crop)))
+
+
+@st.cache_data(show_spinner=False)
+def bushel_scores(crop: str) -> pd.DataFrame:
+    """Teammate's descriptive bushel scores (soil_priority_extras), one row per county. Read-only context:
+    nothing here enters our ranking. Raises if the module or the acres column is missing."""
+    import soil_priority_extras as extras  # noqa: PLC0415  (imported as `extras`, never as `st`)
+    d = extras.add_bushel_losses(tool.load_iowa_with_lon(), split=False)
+    return extras.bushel_priority_scores(d, crop)
+
+
+@st.cache_data(show_spinner=False)
+def bushel_shares(crop: str, fips: tuple) -> tuple | None:
+    """(share of Iowa's expected bushels lost per year, share of Iowa's harvested acres) for the counties `fips`,
+    both from soil_priority_extras. None if the import or the computation fails, so the page shows nothing."""
+    try:
+        scores = bushel_scores(crop).set_index(tool.COL_FIPS)
+        sel = scores.loc[[f for f in fips if f in scores.index]]
+        total_bu, total_acres = scores["bu_lost_per_year"].sum(), scores["avg_acres"].sum()
+        if not (total_bu > 0 and total_acres > 0):
+            return None
+        return float(sel["bu_lost_per_year"].sum() / total_bu), float(sel["avg_acres"].sum() / total_acres)
+    except Exception:  # noqa: BLE001 - descriptive extra; any failure means "show nothing"
+        return None
 
 
 @st.cache_data(show_spinner=False)
