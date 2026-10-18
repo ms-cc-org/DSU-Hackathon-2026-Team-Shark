@@ -22,7 +22,7 @@ python -m streamlit run soil_planner/app.py
 
 Run the app from the repository root, as above. The first load takes a few seconds while the drought penalties and the held-out test are computed; after that every setting change is instant.
 
-Live app: (link to be added)
+**Live app:** [https://team-shark-soil-planner.streamlit.app](https://team-shark-soil-planner.streamlit.app), no install needed.
 
 The report version, `notebooks/Soil_Program_Planner.ipynb`, calls the same functions as the app, so both show the same numbers. To re-run it without opening it: `jupyter nbconvert --to notebook --execute --inplace notebooks/Soil_Program_Planner.ipynb`.
 
