@@ -13,6 +13,7 @@ matplotlib==3.11.2      # static charts, pandas df.plot()
 #modelling
 scikit-learn==1.9.1
 statsmodels==0.15.0     # also enables plotly trendline="ols"
+scipy==1.18.1           # Spearman correlation in soil_planner/soil_tool.py
 
 #pipeline rebuild only
 requests==2.34.2
